@@ -11,14 +11,14 @@
             {% for product in products %}
             <div class="bg-white shadow rounded overflow-hidden group">
                 <div class="relative">
-                    <img src="" alt="product 1" class="w-full">
+                    <img src="{{product[4]}}" alt="product 1" class="w-full">
                 </div>
                 <div class="pt-4 pb-3 px-4">
                     <a href="#">
-                        <h4 class="uppercase font-medium text-xl mb-2 text-gray-800 hover:text-primary transition">{{ product[2] }}</h4>
+                        <h4 class="uppercase font-medium text-xl mb-2 text-gray-800 hover:text-primary transition">{{ product[1] }}</h4>
                     </a>
                     <div class="flex items-baseline mb-1 space-x-2">
-                        <p class="text-xl text-primary font-semibold">${{ product[3] }}</p>
+                        <p class="text-xl text-primary font-semibold">{{ product[3] }}</p>
                     </div>
                 </div>
                 <a href="#"

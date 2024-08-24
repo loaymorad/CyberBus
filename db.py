@@ -85,12 +85,12 @@ def get_user_password(connection, username):
 
 # ------- PRODUCTS -------
 
-def add_product(connection, title, price, description):
+def add_product(connection, title, price, description,image_path=None):
     cursor = connection.cursor()
     
     cursor.execute('''
-        INSERT INTO products (title, price, description) VALUES (?, ?, ?)  
-    ''', (title, price, description))
+        INSERT INTO products (title, price, description,img) VALUES (?, ?, ?, ?)  
+    ''', (title, price, description,image_path))
     
     connection.commit()
     
