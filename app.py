@@ -1,5 +1,5 @@
 from flask import Flask, render_template, session, redirect, url_for, request
-
+import os
 import db
 
 app = Flask(__name__)
@@ -12,6 +12,11 @@ wishlistdb_connection = db.connect_to_database('wishlist.db')
 
 db.make_user_table(userdb_connection)
 db.make_product_table(productdb_connection)
+
+valid_extension = {'jpg', 'jpeg', 'png', 'gif'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in valid_extension
 
 @app.route('/')
 def index():
@@ -72,9 +77,17 @@ def addProduct():
         title = request.form['title']
         price = request.form['price']
         description = request.form['description']
+        product_image = request.files.get("image-upload")
+        filePath = None
+        print(product_image)
+        if product_image and allowed_file(product_image.filename):
+            filePath = os.path.join("./static",product_image.filename)
+            product_image.save(filePath)
+        else:
+            product_image = None
         
-        if title and price and description:
-            db.add_product(productdb_connection, title, price, description)
+        if title and price and description and product_image:
+            db.add_product(productdb_connection, title, price, description,filePath)
             return redirect(url_for('index'))
         
         return "write all your data"
@@ -84,6 +97,9 @@ def wishlist():
     if request.method == 'GET':
         products = db.get_product_from_wishlist(wishlistdb_connection)
         return render_template('wishlist.html', products=products)
+
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
