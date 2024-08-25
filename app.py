@@ -79,10 +79,6 @@ def addProduct():
         
         return "write all your data"
     
-@app.route('/profile', methods=['GET', 'POST'])
-def profile():
-    return render_template('profile.html')
-
 @app.route('/wishlist', methods=['GET', 'POST'])
 def wishlist():
     if request.method == 'GET':
