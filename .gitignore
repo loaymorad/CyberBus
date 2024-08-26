@@ -1,2 +1,2 @@
-virtualenv
-__pycache__
+virtualenv/
+__pycache__/
