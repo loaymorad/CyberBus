@@ -146,6 +146,7 @@ def get_product_from_wishlist(connection, userid): #
 
    #-------------------------comments---------------------M
 
+#------------comments--------
 def init_comments_table(connection):
         cursor = connection.cursor()
         cursor.execute('''
