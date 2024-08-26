@@ -144,6 +144,45 @@ def search_products(connection, title):
     connection.commit()
     
     return cursor.fetchall()
+
+def get_all_products(connection):
+    cursor = connection.cursor()
+    cursor.execute('''
+        SELECT * FROM products
+    ''')
+    products = cursor.fetchall()
+    return products
+
+
+def update_product(connection, product_id, new_title, new_image, new_price):
+    cursor = connection.cursor()
+    
+    cursor.execute('''
+        UPDATE products SET title = ?, img = ?, price = ? WHERE id = ? 
+    ''', (new_title, new_image, new_price, product_id))
+    
+    connection.commit()
+
+
+def get_product_by_id(connection, product_id):
+    cursor = connection.cursor()
+    
+    cursor.execute('''
+        SELECT * FROM products WHERE id = ?
+    ''', (product_id,))
+    
+    product = cursor.fetchone()
+    return product
+
+
+def delete_product_by_title(connection, title):
+    cursor = connection.cursor()
+    
+    cursor.execute('''
+        DELETE FROM products WHERE title = ? 
+    ''', (title,))
+    
+    connection.commit()
  
 # ------- wishlist -------
  
@@ -166,21 +205,3 @@ def get_product_from_wishlist(connection, userid): #
     connection.commit()  
     
     return cursor.fetchall() # get all products for that user
-
-def get_all_products(connection):
-    cursor = connection.cursor()
-    cursor.execute('''
-        SELECT * FROM products
-    ''')
-    products = cursor.fetchall()
-    return products
-
-
-def delete_product_by_title(connection, title):
-    cursor = connection.cursor()
-    
-    cursor.execute('''
-        DELETE FROM products WHERE title = ? 
-    ''', (title,))
-    
-    connection.commit()

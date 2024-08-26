@@ -48,7 +48,7 @@
                 <th class="p-4 border-b border-gray-400 text-left">Image</th>
                 <th class="p-4 border-b border-gray-400 text-left">Title</th>
                 <th class="p-4 border-b border-gray-400 text-left">Price</th>
-                <th class="p-4 border-b border-gray-400 text-left"></th> <!-- Empty header for Action -->
+                <th class="p-4 border-b border-gray-400 text-left">Actions</th> <!-- Empty header for Action -->
             </tr>
         </thead>
         <tbody class="text-gray-700">
@@ -60,11 +60,12 @@
                 <td class="p-4 border-b border-gray-400">{{ product[2] }}</td>
                 <td class="p-4 border-b border-gray-400">{{ product[3] }}</td>
                 <td class="p-4 border-b border-gray-400 text-center">
+                    <a href="{{ url_for('update_product', product_id=product[0]) }}" class="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-400 mr-2">Update</a>
                     <form action="{{ url_for('delete_product') }}" method="POST" style="display:inline;">
                         <input type="hidden" name="title" value="{{ product[2] }}">
                         <button type="submit" class="bg-red-600 text-white py-1 px-3 rounded hover:bg-red-500">Delete</button>
                     </form>
-                </td>
+                </td>              
             </tr>
             {% else %}
             <tr>

@@ -169,6 +169,39 @@ def delete_product():
         db.delete_product_by_title(productdb_connection, product_title)
     return redirect(url_for('admin_panel'))
 
+@app.route('/update_product', methods=['GET', 'POST'])
+def update_product():
+    if request.method == 'POST':
+        product_id = request.form.get('product_id')  # Retrieve the product_id from the form
+        new_title = request.form.get('title')
+        new_price = request.form.get('price')
+        product_image = request.files.get('image')
+        
+        # Retrieve current image filename
+        product = db.get_product_by_id(productdb_connection, product_id)
+        current_image = product[1]  # Assuming image is in the second column of the product tuple
+
+        if product_image and allowed_file(product_image.filename) and allowed_file_content(product_image):
+            if allowed_file_size(product_image):
+                product_image.save(os.path.join(app.config['UPLOAD_FOLDER'], product_image.filename))
+                # Remove old image if it exists
+                old_image_path = os.path.join(app.config['UPLOAD_FOLDER'], current_image)
+                if os.path.exists(old_image_path):
+                    os.remove(old_image_path)
+            else:
+                    return "file is to large"
+        else:
+            product_image.filename = current_image  # Keep the old image if no new file is provided
+        
+        db.update_product(productdb_connection, product_id, new_title, product_image.filename, new_price)
+        return redirect(url_for('admin_panel'))
+    
+    product_id = request.args.get('product_id')  # Retrieve product_id from query parameters
+    if product_id:
+        product = db.get_product_by_id(productdb_connection, product_id)
+        return render_template('updateproduct.html', product=product)
+    return "Product ID is required", 400
+
 
 if __name__ == "__main__":
     db.make_user_table(userdb_connection)

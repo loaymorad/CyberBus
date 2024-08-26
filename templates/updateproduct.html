@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+
+{% block title %}Update Product{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-lg">
+        <h1 class="text-2xl font-bold mb-6 text-center">Update Product</h1>
+        <form action="{{ url_for('update_product') }}" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="product_id" value="{{ product[0] }}">
+            <div class="mb-4">
+                <label class="block text-gray-700">Title:</label>
+                <input type="text" name="title" value="{{ product[2] }}" class="w-full p-2 border border-gray-300 rounded">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Current Image:</label>
+                <img src="{{ url_for('static', filename='uploads/' + product[1]) }}" alt="{{ product[2] }}" class="max-w-48">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">New Image:</label>
+                <input type="file" name="image" class="w-full p-2 border border-gray-300 rounded">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Price:</label>
+                <input type="text" name="price" value="{{ product[3] }}" class="w-full p-2 border border-gray-300 rounded">
+            </div>
+            <div class="text-center">
+                <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-400">Update Product</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
