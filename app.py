@@ -3,15 +3,22 @@ import os
 import db
 import re
 import strong_password
+from markupsafe import escape
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 app = Flask(__name__)
 
 app.secret_key = 'NotHacker' # for using sessions
 
+limiter = Limiter(app=app, key_func=get_remote_address, default_limits=["50 per minute"], storage_uri="memory://")
+app.config['SESSION_COOKIE_HTTPONLY'] = False
+
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 userdb_connection = db.connect_to_database('users.db')
 productdb_connection = db.connect_to_database('products.db')
 wishlistdb_connection = db.connect_to_database('wishlist.db')
+comments_connection = db.connect_to_database('comments.db')
 
 
 
@@ -32,6 +39,7 @@ def index():
     return redirect(url_for('login'))
         
 @app.route('/register', methods=['GET', 'POST'])
+@limiter.limit("10 per minute")
 def register():
     if not 'username' in session: return redirect(url_for('login'))
     if request.method == 'GET':
@@ -55,6 +63,7 @@ def register():
         
 
 @app.route('/login', methods=['GET', 'POST'])
+@limiter.limit("10 per minute")
 def login():
     if request.method == 'GET':
         return render_template('login.html')
@@ -121,6 +130,50 @@ def wishlist():
         products = db.get_product_from_wishlist(wishlistdb_connection, productid)
         print(products)
         return render_template('wishlist.html', products=products)
+    
+@app.route('/search_results', methods=['GET', 'POST'])
+def search():
+    if request.method == 'GET' :
+       #search_query = request.form.get('search_query')
+       #search_query = request.form['search_query']
+       #print(request.form['search_query'])
+       #products_results = db.search_product(productdb_connection, search_query)
+       #print(search_query)
+       return render_template('/search_results.html') #, products_results=products_results)#########
+    
+    elif request.method == 'POST' :
+       search_query = request.form.get('search_query')
+      
+       #search_query = request.form['search_query']
+       #print(request.form['search_query'])
+       products_results = db.search_product(productdb_connection, search_query) 
+       print(products_results)
+       print(search_query)
+       return render_template('/search_results.html', products_results=products_results)#########
+
+    #return render_template('/search_results.html')###########
+
+@app.route('/comments', methods=['GET', 'POST'])
+def addComment():
+    comments = db.get_comments(comments_connection)
+    if request.method == 'POST':
+        text = escape(request.form['comment'])
+        username = session.get('username')
+        if username:
+            db.add_comment(comments_connection, username, text)
+            comments = db.get_comments(comments_connection)
+        else:
+            return("You must be logged in to post a comment.", "warning")
+
+    return render_template('comments.html', comments=comments)
+
+@app.route('/clear_comments', methods=['GET','POST'])
+def clearComments():
+    db.clear_comments(comments_connection)
+    return redirect(url_for('addComment'))
+
+
+
 
 
 
@@ -128,4 +181,5 @@ if __name__ == "__main__":
     db.make_user_table(userdb_connection)
     db.make_product_table(productdb_connection)
     db.make_wishlist_table(productdb_connection)
+    db.init_comments_table(comments_connection)
     app.run(debug=True)

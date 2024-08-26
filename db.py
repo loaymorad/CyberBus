@@ -113,16 +113,13 @@ def get_products(connection):
     
     return cursor.fetchall()
 
-def search_products(connection, title):
-    
+def search_product(connection, search_query):
     cursor = connection.cursor()
-    
-    cursor.execute('''
-        SELECT * FROM products WHERE title LIKE ? 
-    ''', title)
-    
-    connection.commit()
-    
+
+    query = ''' SELECT * FROM products WHERE title LIKE ? '''
+
+    cursor.execute(query, (f"%{search_query}%",))
+
     return cursor.fetchall()
  
 # ------- wishlist -------
@@ -146,3 +143,61 @@ def get_product_from_wishlist(connection, userid): #
     connection.commit()  
     
     return cursor.fetchall() # get all products for that user
+
+   #-------------------------comments---------------------M
+
+def init_comments_table(connection):
+        cursor = connection.cursor()
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS comments (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL,
+            text TEXT NOT NULL,
+            timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+        connection.commit()
+
+def add_comment(connection, username, text):
+    cursor = connection.cursor()
+    query = '''INSERT INTO comments (username, text) VALUES (?, ?)'''
+    cursor.execute(query, (username, text))
+    connection.commit()
+
+def get_comments(connection):
+    cursor = connection.cursor()
+    query = '''
+        SELECT comments.username, comments.text, comments.timestamp
+        FROM comments
+    '''
+    cursor.execute(query)
+    return cursor.fetchall()
+
+def clear_comments(connection):
+    cursor = connection.cursor()
+    query = '''DELETE FROM comments'''
+    cursor.execute(query)
+    connection.commit()
+
+
+    #-----------------product search-------------M
+def search(connection, search_query):
+    cursor = connection.cursor()
+    query = '''SELECT product FROM products WHERE product LIKE ?'''
+    cursor.execute(query, (f"%{search_query}%",))
+    return cursor.fetchall()
+
+
+def init_db(connection):
+    cursor = connection.cursor()
+
+    cursor.execute('''
+		CREATE TABLE IF NOT EXISTS users (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			username TEXT NOT NULL UNIQUE,
+			password TEXT NOT NULL
+		)
+	''')
+
+    connection.commit()
