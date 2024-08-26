@@ -1,6 +1,8 @@
 from flask import Flask, render_template, session, redirect, url_for, request,flash,abort
 import os
 import db
+import re
+import strong_password
 
 app = Flask(__name__)
 
@@ -11,8 +13,7 @@ userdb_connection = db.connect_to_database('users.db')
 productdb_connection = db.connect_to_database('products.db')
 wishlistdb_connection = db.connect_to_database('wishlist.db')
 
-db.make_user_table(userdb_connection)
-db.make_product_table(productdb_connection)
+
 
 valid_extension = {'jpg', 'jpeg', 'png', 'gif'}
 
@@ -22,14 +23,16 @@ def allowed_file(filename):
 @app.route('/')
 def index():
     if 'username' in session:
+        print(session['username'])
         products = db.get_products(productdb_connection) # array of tuples
         # send data from python to html
         return render_template('index.html', products=products,username = session['username'])
-    else:
-        return redirect(url_for('login'))
+
+    return redirect(url_for('login'))
         
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    if not 'username' in session: return redirect(url_for('login'))
     if request.method == 'GET':
         return render_template('register.html')
     elif request.method == 'POST':
@@ -40,8 +43,9 @@ def register():
         user = db.get_user(userdb_connection, username)
         # already nor exist
         if password == "" or username == "":
-            flash("Please enter all the required fields!","error")
-            return redirect(url_for('register'))
+            if strong_password.is_strong(password):   
+                flash("Please enter all the required fields!","error")
+                return redirect(url_for('register'))
         print(imgFile)
         print(imgFile.filename)
         if imgFile and allowed_file(imgFile.filename):
@@ -75,30 +79,30 @@ def login():
         else:
             return "User does not exist"
 
-@app.route('/product', methods=['GET', 'POST'])
-def product():
-    return render_template('product.html')
+@app.route('/logout')
+def logout():
+    session.pop('username')
+    return redirect(url_for('index'))
 
 
 @app.route('/addProduct', methods=['GET', 'POST'])
 def addProduct():
+    if not 'username' in session: return redirect(url_for('login'))
     if request.method == 'GET':
         return render_template('addProduct.html')
     elif request.method == 'POST':
         title = request.form['title']
         price = request.form['price']
         product_image = request.files.get("image-upload")
-        filePath = None
         print(product_image)
-        if product_image and allowed_file(product_image.filename):
-            filePath = os.path.join("./static",product_image.filename)
-            product_image.save(filePath)
-        else:
-            product_image = None
         
-        if title and price and description and product_image:
-            db.add_product(productdb_connection, title, price, description,filePath)
-            return redirect(url_for('index'))
+        if title and price and product_image:
+            if allowed_file(product_image.filename):
+                db.add_product(productdb_connection, title, price,product_image.filename)
+                product_image.save(os.path.join(app.config['UPLOAD_FOLDER'], product_image.filename))
+                return redirect(url_for('index'))
+            else:
+                return "file not allowed"
         
         return "write all your data"
     
@@ -107,7 +111,8 @@ def profile(username):
     user = db.get_user(userdb_connection,username)
     print(user)
     if user is not None and user[1] == session['username']:
-        return render_template('profile.html',user=user)
+        if not 'username' in session: return redirect(url_for('login'))
+    return render_template('profile.html',user=user)
     else:
         abort(404)
 
@@ -115,6 +120,7 @@ def profile(username):
 
 @app.route('/wishlist', methods=['GET', 'POST'])
 def wishlist():
+    if not 'username' in session: return redirect(url_for('login'))
     username = session.get('username')
     
     userid = db.get_userid_by_name(userdb_connection, username)
@@ -128,7 +134,37 @@ def wishlist():
         print(products)
         return render_template('wishlist.html', products=products)
 
+@app.route('/admin', methods=['GET', 'POST'])
+def admin_panel():
+    if 'username' in session:
+        print(session['username'])
+        if session['username'] == 'admin':
+            users = db.get_all_users(userdb_connection)
+            products = db.get_all_products(productdb_connection)
+            print(f"Users: {users}")  # Debugging line
+            print(f"Products: {products}")  # Debugging line
+            return render_template('panel.html', users = users, products = products)
+        else:
+            return f"Welcome, {session['username']}!"
+    return "You are not logged in"
+
+@app.route('/delete_user', methods=['POST'])
+def delete_user():
+    username = request.form.get('username')
+    if username:
+        db.delete_user_by_username(userdb_connection, username)
+    return redirect(url_for('admin_panel'))
+
+@app.route('/delete_product', methods=['POST'])
+def delete_product():
+    product_id = request.form.get('id')
+    if product_id:
+        db.delete_product_by_title(productdb_connection, product_id)
+    return redirect(url_for('admin_panel'))
 
 
 if __name__ == "__main__":
+    db.make_user_table(userdb_connection)
+    db.make_product_table(productdb_connection)
+    db.make_wishlist_table(productdb_connection)
     app.run(debug=True)
