@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session, redirect, url_for, request
+from flask import Flask, render_template, session, redirect, url_for, request,flash
 import os
 import db
 
@@ -39,6 +39,10 @@ def register():
         
         user = db.get_user(userdb_connection, username)
         # already nor exist
+        if password == "" or username == "":
+            flash("Please enter all the required fields!","error")
+            return redirect(url_for('register'))
+
         if user is None:
             db.add_user(userdb_connection, username, password)
             return redirect(url_for('index'))
@@ -79,18 +83,24 @@ def addProduct():
         title = request.form['title']
         price = request.form['price']
         product_image = request.files.get("image-upload")
-            
-        if title and price and product_image:
-            if product_image and allowed_file(product_image.filename):
-                filename = product_image.filename
-                db.add_product(productdb_connection, title, price, filename)
-                product_image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                return redirect(url_for('index'))
-            else:
-                return "Not allowed file extention"
-            
-        return "Please provide all required data"
+        filePath = None
+        print(product_image)
+        if product_image and allowed_file(product_image.filename):
+            filePath = os.path.join("./static",product_image.filename)
+            product_image.save(filePath)
+        else:
+            product_image = None
+        
+        if title and price and description and product_image:
+            db.add_product(productdb_connection, title, price, description,filePath)
+            return redirect(url_for('index'))
+        
+        return "write all your data"
     
+@app.route('/profile', methods=['GET', 'POST'])
+def profile():
+    return render_template('profile.html')
+
 @app.route('/wishlist', methods=['GET', 'POST'])
 def wishlist():
     username = session.get('username')

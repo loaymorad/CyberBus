@@ -10,6 +10,14 @@
             <form action="#" method="post" autocomplete="off">
                 <div class="space-y-2">
                     <div>
+                        {% with messages = get_flashed_messages() %}
+                            {% if messages %}
+                                {% for msg in messages%}
+
+                                    <p>{{msg}}</p>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
                         <label for="username" class="text-gray-600 mb-2 block">username</label>
                         <input type="text" name="username" id="username"
                             class="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-primary placeholder-gray-400"
