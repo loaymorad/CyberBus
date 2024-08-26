@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session, redirect, url_for, request
+from flask import Flask, render_template, session, redirect, url_for, request,flash
 import os
 import db
 
@@ -38,6 +38,10 @@ def register():
         
         user = db.get_user(userdb_connection, username)
         # already nor exist
+        if password == "" or username == "":
+            flash("Please enter all the required fields!","error")
+            return redirect(url_for('register'))
+
         if user is None:
             db.add_user(userdb_connection, username, password)
             return redirect(url_for('index'))
@@ -94,7 +98,7 @@ def addProduct():
     
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
-    return render_template('profile.html')
+    return render_template('profile.html',username = session["username"])
 
 @app.route('/wishlist', methods=['GET', 'POST'])
 def wishlist():
