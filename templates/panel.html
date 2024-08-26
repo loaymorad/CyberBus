@@ -1,0 +1,77 @@
+{% extends "layout.html" %}
+
+{% block title %}User and Product List{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- User List Section -->
+    <div class="text-center mb-12">
+        <div class="inline-block px-6 py-4 bg-gray-200 rounded-lg shadow-lg">
+            <h1 class="text-3xl font-bold mb-6">Users List</h1>
+        </div>
+    </div>
+    <table class="w-full border-collapse border border-gray-400 mb-8 bg-gray-50">
+        <thead class="bg-gray-300 text-gray-800">
+            <tr>
+                <th class="p-4 border-b border-gray-400 text-left">Username</th>
+                <th class="p-4 border-b border-gray-400 text-left"></th> <!-- Empty header for Action -->
+            </tr>
+        </thead>
+        <tbody class="text-gray-700">
+            {% for user in users %}
+            <tr>
+                <td class="p-4 border-b border-gray-400">{{ user.username }}</td>
+                <td class="p-4 border-b border-gray-400 text-center">
+                    <form action="{{ url_for('delete_user') }}" method="POST" style="display:inline;">
+                        <input type="hidden" name="username" value="{{ user.username }}">
+                        <button type="submit" class="bg-red-600 text-white py-1 px-3 rounded hover:bg-red-500">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="2" class="p-4 text-center">No users found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Products List Section -->
+    <div class="text-center mb-12">
+        <div class="inline-block px-6 py-4 bg-gray-200 rounded-lg shadow-lg">
+            <h1 class="text-3xl font-bold mb-6">Products List</h1>
+        </div>
+    </div>
+    <table class="w-full border-collapse border border-gray-400 bg-gray-50">
+        <thead class="bg-gray-300 text-gray-800">
+            <tr>
+                <th class="p-4 border-b border-gray-400 text-left">Image</th>
+                <th class="p-4 border-b border-gray-400 text-left">Title</th>
+                <th class="p-4 border-b border-gray-400 text-left">Price</th>
+                <th class="p-4 border-b border-gray-400 text-left"></th> <!-- Empty header for Action -->
+            </tr>
+        </thead>
+        <tbody class="text-gray-700">
+            {% for product in products %}
+            <tr>
+                <td class="p-4 border-b border-gray-400">
+                    <img src="{{ url_for('static', filename='uploads/' + product[1]) }}" alt="{{ product[2] }}" class="max-w-24 max-h-24">
+                </td>
+                <td class="p-4 border-b border-gray-400">{{ product[2] }}</td>
+                <td class="p-4 border-b border-gray-400">{{ product[3] }}</td>
+                <td class="p-4 border-b border-gray-400 text-center">
+                    <form action="{{ url_for('delete_product') }}" method="POST" style="display:inline;">
+                        <input type="hidden" name="id" value="{{ product[0] }}">
+                        <button type="submit" class="bg-red-600 text-white py-1 px-3 rounded hover:bg-red-500">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4" class="p-4 text-center">No products found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

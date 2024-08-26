@@ -91,6 +91,26 @@ def get_userid_by_name(connection, name):
     
     return cursor.fetchone()
 
+def get_all_users(connection):
+    cursor = connection.cursor()
+    cursor.execute('''
+        SELECT username FROM users
+    ''')
+    users = cursor.fetchall()
+    return [{"username": user[0]} for user in users] 
+
+
+def delete_user_by_username(connection, username):
+    cursor = connection.cursor()
+
+    cursor.execute('''
+        DELETE FROM users WHERE username = ?
+    ''', (username,))
+
+    connection.commit()
+    
+    return cursor.fetchall()
+
 # ------- PRODUCTS -------
 
 def add_product(connection, title, price, image_path):
@@ -201,4 +221,21 @@ def init_db(connection):
 		)
 	''')
 
+    connection.commit()
+def get_all_products(connection):
+    cursor = connection.cursor()
+    cursor.execute('''
+        SELECT * FROM products
+    ''')
+    products = cursor.fetchall()
+    return products
+
+
+def delete_product_by_title(connection, product_id):
+    cursor = connection.cursor()
+    
+    cursor.execute('''
+        DELETE FROM products WHERE id = ? 
+    ''', (product_id))
+    
     connection.commit()

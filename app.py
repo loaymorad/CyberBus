@@ -175,6 +175,33 @@ def clearComments():
 
 
 
+@app.route('/admin', methods=['GET', 'POST'])
+def admin_panel():
+    if 'username' in session:
+        print(session['username'])
+        if session['username'] == 'admin':
+            users = db.get_all_users(userdb_connection)
+            products = db.get_all_products(productdb_connection)
+            print(f"Users: {users}")  # Debugging line
+            print(f"Products: {products}")  # Debugging line
+            return render_template('panel.html', users = users, products = products)
+        else:
+            return f"Welcome, {session['username']}!"
+    return "You are not logged in"
+
+@app.route('/delete_user', methods=['POST'])
+def delete_user():
+    username = request.form.get('username')
+    if username:
+        db.delete_user_by_username(userdb_connection, username)
+    return redirect(url_for('admin_panel'))
+
+@app.route('/delete_product', methods=['POST'])
+def delete_product():
+    product_id = request.form.get('id')
+    if product_id:
+        db.delete_product_by_title(productdb_connection, product_id)
+    return redirect(url_for('admin_panel'))
 
 
 if __name__ == "__main__":
