@@ -7,44 +7,44 @@ def connect_to_database(name):
 # ------- TABLES -------
 
 def make_user_table(connection):
-    cursor = connection.cursor()
-    
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			username TEXT NOT NULL UNIQUE,
-            password TEXT NOT NULL
-		)                   
-    ''')
-    
-    connection.commit()
+        cursor = connection.cursor()
+        
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT NOT NULL UNIQUE,
+                password TEXT NOT NULL
+            )                   
+        ''')
+        
+        connection.commit()
     
 def make_product_table(connection):
-    cursor = connection.cursor()
-    
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS products (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
-            img TEXT NOT NULL,
-			title TEXT NOT NULL,
-            price INTEGER NOT NULL
-		)                   
-    ''')
-    
-    connection.commit()
+        cursor = connection.cursor()
+        
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS products (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                img TEXT NOT NULL,
+                title TEXT NOT NULL,
+                price INTEGER NOT NULL
+            )                   
+        ''')
+        
+        connection.commit()
     
 def make_wishlist_table(connection):
-    cursor = connection.cursor()
-    
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS wishlist (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
-            userid INTEGER NOT NULL,
-			productid INTEGER NOT NULL
-		)                   
-    ''')
-    
-    connection.commit()
+        cursor = connection.cursor()
+        
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS wishlist (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                userid INTEGER NOT NULL,
+                productid INTEGER NOT NULL
+            )                   
+        ''')
+        
+        connection.commit()
 
 # ------- USER -------
 
@@ -85,7 +85,7 @@ def get_userid_by_name(connection, name):
     
     cursor.execute('''
         SELECT id FROM users WHERE username = ?
-    ''', (name))
+    ''', (name,))
     
     connection.commit()
     
@@ -93,7 +93,7 @@ def get_userid_by_name(connection, name):
 
 # ------- PRODUCTS -------
 
-def add_product(connection, title, price, image_path=None):
+def add_product(connection, title, price, image_path):
     cursor = connection.cursor()
     
     cursor.execute('''
@@ -136,7 +136,7 @@ def add_product_to_wishlist(connection, userid, productid): # add when i click t
     
     connection.commit()
 
-def get_product_from_wishlist(connection, userid): # /wishlist
+def get_product_from_wishlist(connection, userid): # 
     cursor = connection.cursor()
     
     cursor.execute('''
@@ -145,4 +145,4 @@ def get_product_from_wishlist(connection, userid): # /wishlist
     
     connection.commit()  
     
-    return cursor.fetchall()
+    return cursor.fetchall() # get all products for that user

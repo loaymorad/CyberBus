@@ -11,8 +11,7 @@ userdb_connection = db.connect_to_database('users.db')
 productdb_connection = db.connect_to_database('products.db')
 wishlistdb_connection = db.connect_to_database('wishlist.db')
 
-db.make_user_table(userdb_connection)
-db.make_product_table(productdb_connection)
+
 
 valid_extension = {'jpg', 'jpeg', 'png', 'gif'}
 
@@ -22,12 +21,13 @@ def allowed_file(filename):
 @app.route('/')
 def index():
     if 'username' in session:
+        print(session['username'])
         products = db.get_products(productdb_connection) # array of tuples
         print(products)
         # send data from python to html
         return render_template('index.html', products=products)
-    else:
-        return redirect(url_for('login'))
+
+    return redirect(url_for('login'))
         
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -83,17 +83,15 @@ def addProduct():
         title = request.form['title']
         price = request.form['price']
         product_image = request.files.get("image-upload")
-        filePath = None
         print(product_image)
-        if product_image and allowed_file(product_image.filename):
-            filePath = os.path.join("./static",product_image.filename)
-            product_image.save(filePath)
-        else:
-            product_image = None
         
-        if title and price and description and product_image:
-            db.add_product(productdb_connection, title, price, description,filePath)
-            return redirect(url_for('index'))
+        if title and price and product_image:
+            if allowed_file(product_image.filename):
+                db.add_product(productdb_connection, title, price,product_image.filename)
+                product_image.save(os.path.join(app.config['UPLOAD_FOLDER'], product_image.filename))
+                return redirect(url_for('index'))
+            else:
+                return "file not allowed"
         
         return "write all your data"
     
@@ -119,4 +117,7 @@ def wishlist():
 
 
 if __name__ == "__main__":
+    db.make_user_table(userdb_connection)
+    db.make_product_table(productdb_connection)
+    db.make_wishlist_table(productdb_connection)
     app.run(debug=True)
