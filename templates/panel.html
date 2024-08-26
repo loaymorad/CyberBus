@@ -61,7 +61,7 @@
                 <td class="p-4 border-b border-gray-400">{{ product[3] }}</td>
                 <td class="p-4 border-b border-gray-400 text-center">
                     <form action="{{ url_for('delete_product') }}" method="POST" style="display:inline;">
-                        <input type="hidden" name="id" value="{{ product[0] }}">
+                        <input type="hidden" name="title" value="{{ product[2] }}">
                         <button type="submit" class="bg-red-600 text-white py-1 px-3 rounded hover:bg-red-500">Delete</button>
                     </form>
                 </td>

@@ -1,4 +1,7 @@
 from flask import Flask, render_template, session, redirect, url_for, request,flash
+from PIL import Image
+from werkzeug.utils import secure_filename
+import io
 import os
 import db
 import re
@@ -19,6 +22,21 @@ valid_extension = {'jpg', 'jpeg', 'png', 'gif'}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in valid_extension
+
+def allowed_file_size(file, MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024):
+    file.seek(0, os.SEEK_END) # Go to the end of the file
+    file_size = file.tell() # Get the size
+    file.seek(0, os.SEEK_SET) # Go back to the start of the file
+    return file_size <= MAX_FILE_SIZE_BYTES
+
+def allowed_file_content(file):
+    try:
+        img = Image.open(file)
+        img.verify()  # Verify the image
+        file.seek(0)  # Reset file pointer to the beginning
+        return True
+    except (IOError, SyntaxError) as e:
+        return False
 
 @app.route('/')
 def index():
@@ -92,12 +110,15 @@ def addProduct():
         print(product_image)
         
         if title and price and product_image:
-            if allowed_file(product_image.filename):
-                db.add_product(productdb_connection, title, price,product_image.filename)
-                product_image.save(os.path.join(app.config['UPLOAD_FOLDER'], product_image.filename))
-                return redirect(url_for('index'))
+            if allowed_file(product_image.filename) and allowed_file_content(product_image):
+                if allowed_file_size(product_image):
+                    db.add_product(productdb_connection, title, price,product_image.filename)
+                    product_image.save(os.path.join(app.config['UPLOAD_FOLDER'], product_image.filename))
+                    return redirect(url_for('index'))
+                else:
+                    return "file is to large"
             else:
-                return "file not allowed"
+                return "file type is not allowed"
         
         return "write all your data"
     
@@ -129,8 +150,6 @@ def admin_panel():
         if session['username'] == 'admin':
             users = db.get_all_users(userdb_connection)
             products = db.get_all_products(productdb_connection)
-            print(f"Users: {users}")  # Debugging line
-            print(f"Products: {products}")  # Debugging line
             return render_template('panel.html', users = users, products = products)
         else:
             return f"Welcome, {session['username']}!"
@@ -145,9 +164,9 @@ def delete_user():
 
 @app.route('/delete_product', methods=['POST'])
 def delete_product():
-    product_id = request.form.get('id')
-    if product_id:
-        db.delete_product_by_title(productdb_connection, product_id)
+    product_title = request.form.get('title')
+    if product_title:
+        db.delete_product_by_title(productdb_connection, product_title)
     return redirect(url_for('admin_panel'))
 
 
