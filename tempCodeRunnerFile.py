@@ -13,11 +13,9 @@ app.secret_key = 'NotHacker' # for using sessions
 limiter = Limiter(app=app, key_func=get_remote_address, default_limits=["50 per minute"], storage_uri="memory://")
 app.config['SESSION_COOKIE_HTTPONLY'] = False
 
-connection = db.connect_to_database()
 userdb_connection = db.connect_to_database('users.db')
 productdb_connection = db.connect_to_database('products.db')
 wishlistdb_connection = db.connect_to_database('wishlist.db')
-comments_connection = db.connect_to_database('comments.db')
 
 db.make_user_table(userdb_connection)
 db.make_product_table(productdb_connection)
@@ -38,7 +36,7 @@ def index():
         return redirect(url_for('login'))
         
 @app.route('/register', methods=['GET', 'POST'])
-@limiter.limit("10 per minute")
+@limiter.limit("5 per minute")
 def register():
     if request.method == 'GET':
         return render_template('register.html')
@@ -56,7 +54,7 @@ def register():
         
 
 @app.route('/login', methods=['GET', 'POST'])
-@limiter.limit("10 per minute")
+@limiter.limit("5 per minute")
 def login():
     if request.method == 'GET':
         return render_template('login.html')
@@ -119,41 +117,14 @@ def get_products(productdb_connection,search_query):
     cursor.execute("SELECT * FROM products WHERE title LIKE %s", (f"%{search_query}%",))
     return cursor.fetchall()
 
-@app.route('/search_results.html', methods=['GET', 'POST'])
+@app.route('/profile', methods=['GET', 'POST'])
 def search():
     if request.method == 'POST' :
        search_query = escape(request.form['search_query'])
        products_results = db.get_products(productdb_connection, search_query)
        print(products_results)
-       return render_template('/search_results.html', products_results=products_results)#########
+       return render_template('/results.html', products_results=products_results)#########
     return render_template('/profile.html')###########
-
-@app.route('/comments', methods=['GET', 'POST'])
-def addComment():
-    comments = db.get_comments(comments_connection)
-    if request.method == 'POST':
-        text = escape(request.form['comment'])
-        username = session.get('username')
-        if username:
-            db.add_comment(comments_connection, username, text)
-            comments = db.get_comments(comments_connection)
-        else:
-            return("You must be logged in to post a comment.", "warning")
-
-    return render_template('comments.html', comments=comments)
-
-@app.route('/clear_comments', methods=['GET','POST'])
-def clearComments():
-    db.clear_comments(comments_connection)
-    return redirect(url_for('addComment'))
 
 if __name__ == "__main__":
     app.run(debug=True)
-    db.init_db(connection)
-    db.init_comments_table(comments_connection)\
-
-
-userdb_connection = db.connect_to_database('users.db')
-productdb_connection = db.connect_to_database('products.db')
-wishlistdb_connection = db.connect_to_database('wishlist.db')
-comments_connection = db.connect_to_database('comments.db')
