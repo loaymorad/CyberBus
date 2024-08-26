@@ -4,6 +4,8 @@ from werkzeug.utils import secure_filename
 import io
 import os
 import db
+import re
+import strong_password
 
 app = Flask(__name__)
 
@@ -49,6 +51,7 @@ def index():
         
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    if not 'username' in session: return redirect(url_for('login'))
     if request.method == 'GET':
         return render_template('register.html')
     elif request.method == 'POST':
@@ -58,8 +61,9 @@ def register():
         user = db.get_user(userdb_connection, username)
         # already nor exist
         if password == "" or username == "":
-            flash("Please enter all the required fields!","error")
-            return redirect(url_for('register'))
+            if strong_password.is_strong(password):   
+                flash("Please enter all the required fields!","error")
+                return redirect(url_for('register'))
 
         if user is None:
             db.add_user(userdb_connection, username, password)
@@ -88,13 +92,15 @@ def login():
         else:
             return "User does not exist"
 
-@app.route('/product', methods=['GET', 'POST'])
-def product():
-    return render_template('product.html')
+@app.route('/logout')
+def logout():
+    session.pop('username')
+    return redirect(url_for('index'))
 
 
 @app.route('/addProduct', methods=['GET', 'POST'])
 def addProduct():
+    if not 'username' in session: return redirect(url_for('login'))
     if request.method == 'GET':
         return render_template('addProduct.html')
     elif request.method == 'POST':
@@ -118,10 +124,12 @@ def addProduct():
     
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
+    if not 'username' in session: return redirect(url_for('login'))
     return render_template('profile.html')
 
 @app.route('/wishlist', methods=['GET', 'POST'])
 def wishlist():
+    if not 'username' in session: return redirect(url_for('login'))
     username = session.get('username')
     
     userid = db.get_userid_by_name(userdb_connection, username)
