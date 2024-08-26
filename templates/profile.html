@@ -16,7 +16,7 @@
                 </div>
                 <div class="flex-grow">
                     <p class="text-gray-600">Hello,</p>
-                    <h4 class="text-gray-800 font-medium">{{username}}</h4>
+                    <h4 class="text-gray-800 font-medium">{{user[1]}}</h4>
                 </div>
             </div>
 
@@ -32,9 +32,14 @@
             
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label for="first">UserName</label>
+                    <label for="profile-pic">Profile Picture</label>
                     <!-- <input type="text" name="first" id="first" class="input-box"> -->
-                    <div style="display:inline-block">{{username}}</div>
+                    <div ><img src = "{{ url_for('static', filename='uploads/' + user[3]) }}" alt = "profile picture" class = "rounded-full w-14 h-14 border border-gray-200 p-1 object-cover d-block"></div>
+                </div>
+                <div>
+                    <label for="first">Username</label>
+                    <!-- <input type="text" name="first" id="first" class="input-box"> -->
+                    <div style="display:inline-block">{{user[1]}}</div>
                 </div>
             </div>
         </div>
