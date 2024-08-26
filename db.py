@@ -176,11 +176,11 @@ def get_all_products(connection):
     return products
 
 
-def delete_product_by_title(connection, product_id):
+def delete_product_by_title(connection, title):
     cursor = connection.cursor()
     
     cursor.execute('''
-        DELETE FROM products WHERE id = ? 
-    ''', (product_id))
+        DELETE FROM products WHERE title = ? 
+    ''', (title,))
     
     connection.commit()
