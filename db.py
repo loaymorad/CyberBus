@@ -13,7 +13,8 @@ def make_user_table(connection):
         CREATE TABLE IF NOT EXISTS users (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			username TEXT NOT NULL UNIQUE,
-            password TEXT NOT NULL
+            password TEXT NOT NULL,
+            imgPath TEXT
 		)                   
     ''')
     
@@ -48,12 +49,12 @@ def make_wishlist_table(connection):
 
 # ------- USER -------
 
-def add_user(connection, username, password):
+def add_user(connection, username, password,imgPath = None):
     cursor = connection.cursor()
     
     cursor.execute('''
-        INSERT INTO users (username, password) VALUES (?, ?)  
-    ''', (username, password))
+        INSERT INTO users (username, password,imgPath) VALUES (?, ?, ?)  
+    ''', (username, password,imgPath))
     
     connection.commit()
     
@@ -90,6 +91,12 @@ def get_userid_by_name(connection, name):
     connection.commit()
     
     return cursor.fetchone()
+
+def get_user_by_id(connection,id):
+        cursor = connection.cursor()
+        cursor.execute('SELECT * FROM users WHERE id = ?', (id,))
+        connection.commit()
+        return cursor.fetchone()
 
 # ------- PRODUCTS -------
 

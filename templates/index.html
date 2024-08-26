@@ -2,6 +2,12 @@
 
 {% block title %}Home{% endblock %}
 
+{% block profiletag %}
+
+<a href="/profile/{{username}}" class="text-gray-200 hover:text-white transition">profile</a>
+{% endblock %}
+
+
 {% block content %}
     <!-- product -->
     <div class="container pb-16">

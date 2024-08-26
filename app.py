@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session, redirect, url_for, request,flash
+from flask import Flask, render_template, session, redirect, url_for, request,flash,abort
 import os
 import db
 
@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 app.secret_key = 'NotHacker' # for using sessions
 
-app.config['UPLOAD_FOLDER'] = 'static/uploads'
+app.config['UPLOAD_FOLDER'] = 'static/uploads/'
 userdb_connection = db.connect_to_database('users.db')
 productdb_connection = db.connect_to_database('products.db')
 wishlistdb_connection = db.connect_to_database('wishlist.db')
@@ -23,9 +23,8 @@ def allowed_file(filename):
 def index():
     if 'username' in session:
         products = db.get_products(productdb_connection) # array of tuples
-        print(products)
         # send data from python to html
-        return render_template('index.html', products=products)
+        return render_template('index.html', products=products,username = session['username'])
     else:
         return redirect(url_for('login'))
         
@@ -36,16 +35,22 @@ def register():
     elif request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        
+        imgFile = request.files.get("img-upload")
+        filePath = None
         user = db.get_user(userdb_connection, username)
         # already nor exist
         if password == "" or username == "":
             flash("Please enter all the required fields!","error")
             return redirect(url_for('register'))
-
+        print(imgFile)
+        print(imgFile.filename)
+        if imgFile and allowed_file(imgFile.filename):
+            filePath = imgFile.filename
+            imgFile.save(filePath)
+            print(imgFile)
         if user is None:
-            db.add_user(userdb_connection, username, password)
-            return redirect(url_for('index'))
+            db.add_user(userdb_connection, username, password,filePath)
+            return redirect(url_for('login'))
         else:
             return "User already exists"
         
@@ -97,9 +102,16 @@ def addProduct():
         
         return "write all your data"
     
-@app.route('/profile', methods=['GET', 'POST'])
-def profile():
-    return render_template('profile.html')
+@app.route('/profile/<username>', methods=['GET', 'POST'])
+def profile(username):
+    user = db.get_user(userdb_connection,username)
+    print(user)
+    if user is not None and user[1] == session['username']:
+        return render_template('profile.html',user=user)
+    else:
+        abort(404)
+
+    
 
 @app.route('/wishlist', methods=['GET', 'POST'])
 def wishlist():

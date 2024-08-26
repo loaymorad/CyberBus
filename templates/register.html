@@ -7,7 +7,7 @@
     <div class="contain py-16">
         <div class="max-w-lg mx-auto shadow px-6 py-7 rounded overflow-hidden">
             <h2 class="text-2xl uppercase font-medium mb-1">Create an account</h2>
-            <form action="#" method="post" autocomplete="off">
+            <form action="#" method="post" enctype="multipart/form-data" autocomplete="off">
                 <div class="space-y-2">
                     <div>
                         {% with messages = get_flashed_messages() %}
@@ -30,6 +30,14 @@
                             class="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-primary placeholder-gray-400"
                             placeholder="*******">
                     </div>
+
+                    <div>
+                        <label for="img-upload" class="text-gray-600 mb-2 block">Upload Picture</label>
+                        <input type="file" name="img-upload" id="img-upload"
+                            class="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-primary placeholder-gray-400"
+                           >
+                    </div>
+
                     
                 </div>
                 <div class="mt-6">
