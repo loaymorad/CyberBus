@@ -6,6 +6,7 @@ app = Flask(__name__)
 
 app.secret_key = 'NotHacker' # for using sessions
 
+app.config['UPLOAD_FOLDER'] = 'static/uploads'
 userdb_connection = db.connect_to_database('users.db')
 productdb_connection = db.connect_to_database('products.db')
 wishlistdb_connection = db.connect_to_database('wishlist.db')
@@ -22,7 +23,7 @@ def allowed_file(filename):
 def index():
     if 'username' in session:
         products = db.get_products(productdb_connection) # array of tuples
-        
+        print(products)
         # send data from python to html
         return render_template('index.html', products=products)
     else:
@@ -58,7 +59,7 @@ def login():
         if user:
             pwd = db.get_user_password(userdb_connection, username)
             if password == pwd[0]:
-                session['username'] = username  # Chatgpt: Store username in session
+                session['username'] = username
                 return redirect(url_for('index'))
             else:
                 return "Incorrect username or password"
@@ -69,6 +70,7 @@ def login():
 def product():
     return render_template('product.html')
 
+
 @app.route('/addProduct', methods=['GET', 'POST'])
 def addProduct():
     if request.method == 'GET':
@@ -76,28 +78,33 @@ def addProduct():
     elif request.method == 'POST':
         title = request.form['title']
         price = request.form['price']
-        description = request.form['description']
         product_image = request.files.get("image-upload")
-        filePath = None
-        print(product_image)
-        if product_image and allowed_file(product_image.filename):
-            filePath = os.path.join("./static",product_image.filename)
-            product_image.save(filePath)
-        else:
-            product_image = None
-        
-        if title and price and description and product_image:
-            db.add_product(productdb_connection, title, price, description,filePath)
-            return redirect(url_for('index'))
-        
-        return "write all your data"
+            
+        if title and price and product_image:
+            if product_image and allowed_file(product_image.filename):
+                filename = product_image.filename
+                db.add_product(productdb_connection, title, price, filename)
+                product_image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                return redirect(url_for('index'))
+            else:
+                return "Not allowed file extention"
+            
+        return "Please provide all required data"
     
 @app.route('/wishlist', methods=['GET', 'POST'])
 def wishlist():
-    if request.method == 'GET':
-        products = db.get_product_from_wishlist(wishlistdb_connection)
-        return render_template('wishlist.html', products=products)
+    username = session.get('username')
+    
+    userid = db.get_userid_by_name(userdb_connection, username)
+    if request.method == 'POST':
+        productid = request.form['product_id']        
+        # add it to wishlist connected to user id
+        db.add_product_to_wishlist(wishlistdb_connection, userid, productid)
 
+    elif request.method == 'GET':
+        products = db.get_product_from_wishlist(wishlistdb_connection, productid)
+        print(products)
+        return render_template('wishlist.html', products=products)
 
 
 

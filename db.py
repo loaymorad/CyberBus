@@ -27,8 +27,7 @@ def make_product_table(connection):
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
             img TEXT NOT NULL,
 			title TEXT NOT NULL,
-            price INTEGER NOT NULL,
-            description TEXT NOT NULL
+            price INTEGER NOT NULL
 		)                   
     ''')
     
@@ -40,15 +39,14 @@ def make_wishlist_table(connection):
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS wishlist (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
-            img TEXT NOT NULL,
-			title TEXT NOT NULL,
-            price INTEGER NOT NULL
+            userid INTEGER NOT NULL,
+			productid INTEGER NOT NULL
 		)                   
     ''')
     
     connection.commit()
 
-# ------- AUTH -------
+# ------- USER -------
 
 def add_user(connection, username, password):
     cursor = connection.cursor()
@@ -82,15 +80,25 @@ def get_user_password(connection, username):
     
     return cursor.fetchone()
 
-
-# ------- PRODUCTS -------
-
-def add_product(connection, title, price, description,image_path=None):
+def get_userid_by_name(connection, name):
     cursor = connection.cursor()
     
     cursor.execute('''
-        INSERT INTO products (title, price, description,img) VALUES (?, ?, ?, ?)  
-    ''', (title, price, description,image_path))
+        SELECT id FROM users WHERE username = ?
+    ''', (name))
+    
+    connection.commit()
+    
+    return cursor.fetchone()
+
+# ------- PRODUCTS -------
+
+def add_product(connection, title, price, image_path=None):
+    cursor = connection.cursor()
+    
+    cursor.execute('''
+        INSERT INTO products (img, title, price) VALUES (?, ?, ?)  
+    ''', (image_path, title, price ))
     
     connection.commit()
     
@@ -117,20 +125,24 @@ def search_products(connection, title):
     
     return cursor.fetchall()
  
-def add_product_to_wishlist(connection, img, title, price): # add when i click to a single product
+# ------- wishlist -------
+ 
+def add_product_to_wishlist(connection, userid, productid): # add when i click to a single product
     cursor = connection.cursor()
     
     cursor.execute('''
-        INSERT INTO wishlist (img, title, price) VALUES (?, ?, ?)  
-    ''', (img, title, price))
+        INSERT INTO wishlist (userid, productid) VALUES (?, ?)  
+    ''', (userid, productid))
     
     connection.commit()
 
-def get_product_from_wishlist(connection): # /wishlist
+def get_product_from_wishlist(connection, userid): # /wishlist
     cursor = connection.cursor()
     
     cursor.execute('''
-        SELECT * FROM wishlist
-    ''')
+        SELECT * FROM wishlist where userid = ?
+    ''', (userid,))
     
     connection.commit()  
+    
+    return cursor.fetchall()
