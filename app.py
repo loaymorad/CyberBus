@@ -1,6 +1,8 @@
 from flask import Flask, render_template, session, redirect, url_for, request,flash
 from PIL import Image
 from werkzeug.utils import secure_filename
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 import io
 import os
 import db
@@ -16,7 +18,8 @@ userdb_connection = db.connect_to_database('users.db')
 productdb_connection = db.connect_to_database('products.db')
 wishlistdb_connection = db.connect_to_database('wishlist.db')
 
-
+limiter = Limiter(app=app, key_func=get_remote_address, default_limits=[
+                  "50 per minute"], storage_uri="memory://")
 
 valid_extension = {'jpg', 'jpeg', 'png', 'gif'}
 
@@ -50,6 +53,7 @@ def index():
     return redirect(url_for('login'))
         
 @app.route('/register', methods=['GET', 'POST'])
+@limiter.limit("10 per minute")
 def register():
     if not 'username' in session: return redirect(url_for('login'))
     if request.method == 'GET':
@@ -73,6 +77,7 @@ def register():
         
 
 @app.route('/login', methods=['GET', 'POST'])
+@limiter.limit("10 per minute")
 def login():
     if request.method == 'GET':
         return render_template('login.html')
