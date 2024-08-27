@@ -1,13 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
-    <title>Comments</title>
-</head>
-<body>
+{% extends "layout.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
     <div class="container-fluid">
         <div class="row justify-content-center">
             <div class="col-md-9 col-lg-9 form-container p-4 mt-5 me-1">
@@ -35,5 +30,5 @@
         </div>
     </div>
     <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
-</body>
-</html>
+{% endblock %}
+

@@ -41,7 +41,6 @@ def index():
 @app.route('/register', methods=['GET', 'POST'])
 @limiter.limit("10 per minute")
 def register():
-    if not 'username' in session: return redirect(url_for('login'))
     if request.method == 'GET':
         return render_template('register.html')
     elif request.method == 'POST':
@@ -134,24 +133,16 @@ def wishlist():
 @app.route('/search_results', methods=['GET', 'POST'])
 def search():
     if request.method == 'GET' :
-       #search_query = request.form.get('search_query')
-       #search_query = request.form['search_query']
-       #print(request.form['search_query'])
-       #products_results = db.search_product(productdb_connection, search_query)
-       #print(search_query)
        return render_template('/search_results.html') #, products_results=products_results)#########
     
     elif request.method == 'POST' :
        search_query = request.form.get('search_query')
       
-       #search_query = request.form['search_query']
-       #print(request.form['search_query'])
        products_results = db.search_product(productdb_connection, search_query) 
        print(products_results)
        print(search_query)
        return render_template('/search_results.html', products_results=products_results)#########
 
-    #return render_template('/search_results.html')###########
 
 @app.route('/comments', methods=['GET', 'POST'])
 def addComment():
@@ -178,12 +169,9 @@ def clearComments():
 @app.route('/admin', methods=['GET', 'POST'])
 def admin_panel():
     if 'username' in session:
-        print(session['username'])
         if session['username'] == 'admin':
             users = db.get_all_users(userdb_connection)
             products = db.get_all_products(productdb_connection)
-            print(f"Users: {users}")  # Debugging line
-            print(f"Products: {products}")  # Debugging line
             return render_template('panel.html', users = users, products = products)
         else:
             return f"Welcome, {session['username']}!"
@@ -209,4 +197,5 @@ if __name__ == "__main__":
     db.make_product_table(productdb_connection)
     db.make_wishlist_table(productdb_connection)
     db.init_comments_table(comments_connection)
+    
     app.run(debug=True)

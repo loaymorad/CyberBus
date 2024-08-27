@@ -1,46 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link
-			rel="stylesheet"
-			href="{{ url_for('static', filename='css/bootstrap.min.css') }}"
-		/>
-		<link
-			rel="stylesheet"
-			href="{{ url_for('static', filename='css/style.css') }}"
-		/>
-		<title>Search Results</title>
-	</head>
-	<body class="centered-body">
-		<div class="container">
-			<div class="row justify-content-center">
-				<div class="col-md-6 col-lg-4 form-container p-4 mt-5">
-					<!-- Search Bar -->
-					<h3>Search result for {{search_query}}</h3>
-					<form class="search-form" method="POST" action="{{ url_for('search') }}">##
-						<div class="mb-3">
-							<input type="text" class="form-control" placeholder="Search" required name="search_query">
-						</div>
-						<button type="submit" class="btn btn-primary">Search</button>
-					</form>					
-				</div>
-			</div>
+{% extends "layout.html" %}
 
-			<div class="row justify-content-center">
-				<div class="col-md-6 col-lg-4">
-					<!-- products List -->
-					<ul class="list-group">
+{% block title %}Add Product{% endblock %}
+
+{% block content %}
+	<div class="">
+		<div class="container mx-auto flex flex-col items-center">
+				<div class="row justify-content-center">
+					<div class="col-md-6 col-lg-4 form-container p-4 mt-5">
+						<!-- Search Bar -->
+						<h3>Search result for {{search_query}}</h3>
+						<form class="search-form" method="POST" action="{{ url_for('search') }}">##
+							<div class="mb-3">
+								<input type="text" class="form-control" placeholder="Search" required name="search_query">
+							</div>
+							<button type="submit" class="btn btn-primary">Search</button>
+						</form>					
+					</div>
+				</div>
+	
+				<div class="row justify-content-center">
+					<div class="container mx-auto flex flex-row flex-wrap">
+						<!-- products List -->
 						{% for products_result in products_results %}
-						<li class="list-group-item">{{ products_result[2] }}</li>
+						<div class="bg-white shadow rounded overflow-hidden group w-1/4">
+							<div class="relative">
+								<img src="{{ url_for('static', filename='uploads/' + products_result[1]) }}" alt="product 1" class="w-full">
+							</div>
+							<div class="pt-4 pb-3 px-4">
+								<a href="#">
+									<h4 class="uppercase font-medium text-xl mb-2 text-gray-800 hover:text-primary transition">{{ products_result[2] }}</h4>
+								</a>
+								<div class="flex items-baseline mb-1 space-x-2">
+									<p class="text-xl text-primary font-semibold">{{ products_result[3] }}$</p>
+								</div>
+							</div>
+							<form action="#" method="POST">
+								<input type="hidden" name="product_id" value="{{ products_result[0] }}">
+								<button type="submit" class="block w-full py-1 text-center text-black bg-primary border border-primary rounded-b hover:bg-transparent hover:text-primary transition">
+									Add to cart
+								</button>
+							</form>
+						</div>
 						{% endfor %}
-					</ul>
+					</div>
 				</div>
-			</div>
 		</div>
+	</div>
 
-		<script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
-		<script src="{{ url_for('static', filename='js/close-all-alerts.js') }}"></script>
-	</body>
-</html>
+	<script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/close-all-alerts.js') }}"></script>
+{% endblock %}
