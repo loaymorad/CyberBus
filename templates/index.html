@@ -21,7 +21,7 @@
                         <p class="text-xl text-primary font-semibold">{{ product[3] }}$</p>
                     </div>
                 </div>
-                <form action="#" method="POST">
+                <form action="{{ url_for('wishlist') }}" method="POST">
                     <input type="hidden" name="product_id" value="{{ product[0] }}">
                     <button type="submit" class="block w-full py-1 text-center text-black bg-primary border border-primary rounded-b hover:bg-transparent hover:text-primary transition">
                         Add to cart

@@ -117,19 +117,35 @@ def profile():
 @app.route('/wishlist', methods=['GET', 'POST'])
 def wishlist():
     if not 'username' in session: return redirect(url_for('login'))
-    username = session.get('username')
     
+    username = session.get('username')
     userid = db.get_userid_by_name(userdb_connection, username)
+    
     if request.method == 'POST':
         productid = request.form['product_id']        
         # add it to wishlist connected to user id
-        db.add_product_to_wishlist(wishlistdb_connection, userid, productid)
+        db.add_product_to_wishlist(wishlistdb_connection, userid[0], productid)
 
-    elif request.method == 'GET':
-        products = db.get_product_from_wishlist(wishlistdb_connection, productid)
-        print(products)
-        return render_template('wishlist.html', products=products)
     
+    all_products = db.get_product_from_wishlist(wishlistdb_connection, productid)
+    print(all_products)
+    
+    user_products = set()
+    for product in all_products:
+        product_details = db.get_products_by_id(productdb_connection, product[2])
+        # Convert the list to a tuple
+        user_products.add(tuple(product_details[0]))
+    
+    print(f"user_products: {user_products}")
+    return render_template('wishlist.html', products=user_products)
+
+@app.route('/remove', methods=['GET', 'POST'])
+def remove():
+    if request.method == 'POST':
+        productid = request.form['product_id']
+        db.remove_product(productdb_connection, productid)
+  
+  
 @app.route('/search_results', methods=['GET', 'POST'])
 def search():
     if request.method == 'GET' :
@@ -163,9 +179,6 @@ def clearComments():
     db.clear_comments(comments_connection)
     return redirect(url_for('addComment'))
 
-
-
-
 @app.route('/admin', methods=['GET', 'POST'])
 def admin_panel():
     if 'username' in session:
@@ -195,7 +208,7 @@ def delete_product():
 if __name__ == "__main__":
     db.make_user_table(userdb_connection)
     db.make_product_table(productdb_connection)
-    db.make_wishlist_table(productdb_connection)
+    db.make_wishlist_table(wishlistdb_connection)
     db.init_comments_table(comments_connection)
     
     app.run(debug=True)

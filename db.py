@@ -142,6 +142,15 @@ def search_product(connection, search_query):
 
     return cursor.fetchall()
  
+def remove_product(connection, productid):
+    cursor = connection.cursor()
+    
+    cursor.execute('''
+        DELETE FROM wishlist WHERE productid = ?
+    ''',(productid,))
+    
+    connection.commit()
+
 # ------- wishlist -------
  
 def add_product_to_wishlist(connection, userid, productid): # add when i click to a single product
@@ -153,7 +162,7 @@ def add_product_to_wishlist(connection, userid, productid): # add when i click t
     
     connection.commit()
 
-def get_product_from_wishlist(connection, userid): # 
+def get_product_from_wishlist(connection, userid): 
     cursor = connection.cursor()
     
     cursor.execute('''
@@ -164,7 +173,16 @@ def get_product_from_wishlist(connection, userid): #
     
     return cursor.fetchall() # get all products for that user
 
-   #-------------------------comments---------------------M
+def get_products_by_id(connection, productid):
+    cursor = connection.cursor()
+    
+    cursor.execute('''
+        SELECT * FROM products where id = ?
+    ''', (productid,))
+    
+    connection.commit()  
+    
+    return cursor.fetchall()
 
 #------------comments--------
 def init_comments_table(connection):
