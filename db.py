@@ -141,15 +141,6 @@ def search_product(connection, search_query):
     cursor.execute(query, (f"%{search_query}%",))
 
     return cursor.fetchall()
- 
-def remove_product(connection, productid):
-    cursor = connection.cursor()
-    
-    cursor.execute('''
-        DELETE FROM wishlist WHERE productid = ?
-    ''',(productid,))
-    
-    connection.commit()
 
 # ------- wishlist -------
  

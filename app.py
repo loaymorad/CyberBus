@@ -120,34 +120,32 @@ def wishlist():
     
     username = session.get('username')
     userid = db.get_userid_by_name(userdb_connection, username)
+    productid = None
     
     if request.method == 'POST':
         productid = request.form['product_id']        
         # add it to wishlist connected to user id
         db.add_product_to_wishlist(wishlistdb_connection, userid[0], productid)
 
-    
-    all_products = db.get_product_from_wishlist(wishlistdb_connection, productid)
-    print(all_products)
-    
-    user_products = set()
-    for product in all_products:
-        product_details = db.get_products_by_id(productdb_connection, product[2])
-        # Convert the list to a tuple
-        user_products.add(tuple(product_details[0]))
-    
-    print(f"user_products: {user_products}")
-    return render_template('wishlist.html', products=user_products)
+    if productid:
+        all_products = db.get_product_from_wishlist(wishlistdb_connection, productid)
 
-@app.route('/remove', methods=['GET', 'POST'])
-def remove():
-    if request.method == 'POST':
-        productid = request.form['product_id']
-        db.remove_product(productdb_connection, productid)
-  
+        user_products = set()
+        total_price = 0
+        for product in all_products:
+            product_details = db.get_products_by_id(productdb_connection, product[2])
+            # Convert the list to a tuple
+            total_price += product_details[3]
+        
+
+        return render_template('wishlist.html', products=user_products, total_price=total_price)
+
+    else:
+        return render_template('wishlist.html')
   
 @app.route('/search_results', methods=['GET', 'POST'])
 def search():
+    if not 'username' in session: return redirect(url_for('login'))
     if request.method == 'GET' :
        return render_template('/search_results.html') #, products_results=products_results)#########
     
@@ -162,6 +160,7 @@ def search():
 
 @app.route('/comments', methods=['GET', 'POST'])
 def addComment():
+    if not 'username' in session: return redirect(url_for('login'))
     comments = db.get_comments(comments_connection)
     if request.method == 'POST':
         text = escape(request.form['comment'])

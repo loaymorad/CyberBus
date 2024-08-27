@@ -18,11 +18,6 @@
                         <h2 class="text-gray-800 text-xl font-medium uppercase">{{ product[2] }}</h2>
                     </div>
                     <div class="text-primary text-lg font-semibold">${{ product[3] }}</div>
-                    <form action="{{ url_for('remove') }}" method="post">
-                        <input type="hidden" name="product_id" value="{{ product[0] }}">
-                        <button
-                            class=" px-6 py-2 text-center text-sm text-white bg-red-700 border rounded transition uppercase font-roboto font-medium">remove</button>
-                    </form>
                     <div class="text-gray-600 cursor-pointer hover:text-primary">
                         <i class="fa-solid fa-trash"></i>
                     </div>
@@ -30,7 +25,13 @@
                 </div>
             {% endfor %}
             <!-- ./wishlist -->
-    
+            <div class="col-span-9 space-y-4">
+                <div class="flex items-center justify-between border gap-6 p-4 border-gray-200 rounded">
+                    <div>
+                        <h5>Total price = {{ total_price }}</h5>
+                    </div>
+                </div>
+                </div>
         </div>
         <!-- ./wrapper -->
 
