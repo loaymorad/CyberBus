@@ -9,9 +9,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
 
@@ -20,59 +18,50 @@
 
 </head>
 
-<body>
-    <div class="h-screen grid grid-rows-6">
-        <!-- navbar -->
-        <nav class="max-h-20 bg-gray-800 flex items-center justify-center row-span-1">
-            <div class="container mx-auto flex justify-between items-center gap-4 md:px-10">
-                <!-- logo -->
-                <a href="/">
-                    <p class="font-extrabold text-white">Cyber <span class="text-gray-300">Bus</span></p>
-                </a>
-                <!-- search -->
-                <div class="w-full max-w-lg relative flex">
-                    <span class="absolute left-4 top-3 text-lg text-gray-400">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                    </span>
-                    <input type="text" name="search" id="search"
-                        class="w-full border border-primary border-r-0 pl-12 py-3 pr-3 rounded-l-md focus:outline-none hidden md:flex"
-                        placeholder="search">
-                    <a href="/search"
-                        class="bg-primary border border-primary text-white px-8 rounded-r-md hover:bg-transparent hover:text-primary transition hidden md:flex items-center">Search</a>
-                </div>
-    
-                <div class="flex items-center justify-between py-5 gap-3">
-                    <div class="flex w-fit items-center space-x-6 capitalize">    
-                        <a href="/addProduct" class="text-gray-200 hover:text-white transition">Add Product</a>     
-                        <a href="/wishlist" class="text-gray-200 hover:text-white transition">wishlist</a>     
-                    
-                    </div>
-                    <a href="/profile" class="text-gray-200 hover:text-white transition">profile</a>
-                </div>
+<body class="h-screen flex flex-col">
+    <!-- navbar -->
+    <nav class="bg-gray-800 flex items-center justify-center max-h-20 flex-none">
+        <div class="container mx-auto flex justify-between items-center gap-4 md:px-10">
+            <!-- logo -->
+            <a href="/">
+                <p class="font-extrabold text-white">Cyber <span class="text-gray-300">Bus</span></p>
+            </a>
+            <!-- search -->
+            <div class="w-full max-w-lg relative flex">
+                <span class="absolute left-4 top-3 text-lg text-gray-400">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </span>
+                <input type="text" name="search" id="search" class="w-full border border-primary border-r-0 pl-12 py-3 pr-3 rounded-l-md focus:outline-none hidden md:flex" placeholder="search">
+                <a href="/search" class="bg-primary border border-primary text-white px-8 rounded-r-md hover:bg-transparent hover:text-primary transition hidden md:flex items-center">Search</a>
             </div>
-        </nav>
-        <!-- ./navbar -->
-    
-        <main class="flex items-center justify-center row-span-6 md:px-10">
-            {% block content %}
-                <!-- Default content -->
-            {% endblock %}
-    
-        </main>
-    
-    
-        <!-- footer -->
-        <footer class="max-h-20  bg-gray-800 py-4 flex items-center justify-end row-span-1 md:px-10">
-            <div class="container flex items-center justify-between">
-                <p class="text-white">&copy; cyberbus - All Right Reserved</p>
-                <div>
-                    <img src="static/assets/images/methods.png" alt="methods" class="h-5">
+
+            <div class="flex items-center justify-between py-5 gap-3">
+                <div class="flex w-fit items-center space-x-6 capitalize">    
+                    <a href="/addProduct" class="text-gray-200 hover:text-white transition">Add Product</a>     
+                    <a href="/wishlist" class="text-gray-200 hover:text-white transition">wishlist</a>     
                 </div>
+                <a href="/profile" class="text-gray-200 hover:text-white transition">profile</a>
             </div>
-        </footer>
-        <!-- ./footer -->
-        
-    </div>
+        </div>
+    </nav>
+    <!-- ./navbar -->
+
+    <main class="flex-grow flex items-center justify-center md:px-10">
+        {% block content %}
+            <!-- Default content -->
+        {% endblock %}
+    </main>
+
+    <!-- footer -->
+    <footer class="bg-gray-800 py-4 flex items-center justify-end max-h-20 flex-none md:px-10">
+        <div class="container flex items-center justify-between">
+            <p class="text-white">&copy; cyberbus - All Right Reserved</p>
+            <div>
+                <img src="static/assets/images/methods.png" alt="methods" class="h-5">
+            </div>
+        </div>
+    </footer>
+    <!-- ./footer -->
 </body>
 
 </html>

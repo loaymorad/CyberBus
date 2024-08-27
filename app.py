@@ -34,9 +34,9 @@ def allowed_file_size(file, MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024):
 
 def allowed_file_content(file):
     try:
-        img = Image.open(file)
+        img = Image.open(file) # open the file as an image
         img.verify()  # Verify the image
-        file.seek(0)  # Reset file pointer to the beginning
+        file.seek(0)  # Reset file pointer to the beginning that allows the file to be read again later if needed
         return True
     except (IOError, SyntaxError) as e:
         return False
@@ -55,7 +55,6 @@ def index():
 @app.route('/register', methods=['GET', 'POST'])
 @limiter.limit("10 per minute")
 def register():
-    if not 'username' in session: return redirect(url_for('login'))
     if request.method == 'GET':
         return render_template('register.html')
     elif request.method == 'POST':
@@ -121,15 +120,17 @@ def addProduct():
                     product_image.save(os.path.join(app.config['UPLOAD_FOLDER'], product_image.filename))
                     return redirect(url_for('index'))
                 else:
-                    return "file is to large"
+                    return "file is to large", 400
             else:
-                return "file type is not allowed"
+                return "file type is not allowed", 400
         
         return "write all your data"
     
-@app.route('/profile', methods=['GET', 'POST'])
+@app.route('/profile', methods=['GET', 'POST']) # idor
 def profile():
     if not 'username' in session: return redirect(url_for('login'))
+    if session['username'] != username:
+        return "Access denied", 403  # Forbidden
     return render_template('profile.html')
 
 @app.route('/wishlist', methods=['GET', 'POST'])
@@ -184,7 +185,7 @@ def update_product():
         
         # Retrieve current image filename
         product = db.get_product_by_id(productdb_connection, product_id)
-        current_image = product[1]  # Assuming image is in the second column of the product tuple
+        current_image = product[1]
 
         if product_image and allowed_file(product_image.filename) and allowed_file_content(product_image):
             if allowed_file_size(product_image):
@@ -194,7 +195,7 @@ def update_product():
                 if os.path.exists(old_image_path):
                     os.remove(old_image_path)
             else:
-                    return "file is to large"
+                    return "file is to large", 400
         else:
             product_image.filename = current_image  # Keep the old image if no new file is provided
         

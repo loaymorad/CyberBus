@@ -139,7 +139,7 @@ def search_products(connection, title):
     
     cursor.execute('''
         SELECT * FROM products WHERE title LIKE ? 
-    ''', title)
+    ''', (title,))
     
     connection.commit()
     
