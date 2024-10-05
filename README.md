@@ -13,7 +13,7 @@ This is a simple e-commerce application built with Flask. The application allows
 1. **Clone the repository**:
 
     ```bash
-    git clone https://github.com/yourusername/flask-ecommerce.git
+    git clone https://github.com/loaymorad/CyberBus.git
     cd flask-ecommerce
     ```
 
