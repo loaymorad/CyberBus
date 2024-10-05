@@ -1,32 +1,12 @@
-```markdown
 # Flask E-Commerce Application
 
-This is a simple e-commerce application built with Flask, a lightweight web framework for Python. The application allows users to register, log in, view products, add products, and manage a wishlist.
+This is a simple e-commerce application built with Flask. The application allows users to register, log in, view products, add products, and manage a wishlist.
 
 ## Features
 
 - **User Authentication**: Register and log in with username and password.
 - **Product Management**: View and add products to the catalog.
 - **Wishlist**: Add products to a wishlist and view them later.
-
-## Main Files Structure
-
-```plaintext
-.
-├── app.py                 # Main application file, handles routes and rendering
-├── db.py                  # Database connections and queries
-├── templates/             # HTML files for rendering views
-│   ├── addProduct.html
-│   ├── index.html
-│   ├── layout.html
-│   ├── login.html
-│   ├── product.html
-│   ├── profile.html
-│   ├── register.html
-│   └── wishlist.html
-├── static/                # Static files like CSS, JavaScript, and images
-└── README.md              # This readme file
-```
 
 ## Installation
 
@@ -39,7 +19,7 @@ This is a simple e-commerce application built with Flask, a lightweight web fram
 
 3. **Install dependencies**:
 
-    flask, tailwind
+    flask
 
 4. **Set up the database**:
 
@@ -87,8 +67,3 @@ The application uses three SQLite tables:
 ## Contributing
 
 If you'd like to contribute, please fork the repository and use a feature branch. Pull requests are warmly welcome.
-
-## License
-
-This project is licensed under the MIT License.
-```
